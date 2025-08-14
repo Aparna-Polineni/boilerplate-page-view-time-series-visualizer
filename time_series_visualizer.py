@@ -1,6 +1,7 @@
 import matplotlib.pyplot as plt
 import pandas as pd
 import seaborn as sns
+import numpy as np
 from pandas.plotting import register_matplotlib_converters
 register_matplotlib_converters()
 
@@ -10,7 +11,7 @@ df = pd.read_csv("fcc-forum-pageviews.csv", parse_dates=['date'], index_col='dat
 # Clean data (repove top 2.5% and bottom 2.5%)
 low_value = df['value'].quantile(0.025)
 high_value = df['value'].quantile(0.975)
-df = df[(df['value'] >= low_value)&(df['value' <= high_value])]
+df = df[(df['value'] >= low_value)&(df['value'] <= high_value)]
 
 
 def draw_line_plot():
@@ -29,7 +30,7 @@ def draw_bar_plot():
     # Copy and modify data for monthly bar plot
     df_bar = df.copy()
     df_bar['year'] = df_bar.index.year
-    df_bar['month'] = df_bar.index_month_name()
+    df_bar['month'] = df_bar.index.month_name()
 
     df_grouped = df_bar.groupby(['year', 'month'])['value'].mean().unstack()
 
@@ -38,7 +39,7 @@ def draw_bar_plot():
     df_grouped = df_grouped[month_order]
 
     # Draw bar plot
-    fig = df_grouped.plot(king="bar", figsize=(12,6).figure)
+    fig = df_grouped.plot(kind="bar", figsize=(12,6)).get_figure()
     plt.xlabel("Years")
     plt.ylabel("Average Page Views")
     plt.legend(title="Months")
